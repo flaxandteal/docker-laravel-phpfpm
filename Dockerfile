@@ -50,4 +50,9 @@ VOLUME ["/data"]
 
 EXPOSE 9000
 
-ENTRYPOINT ["/usr/sbin/php5-fpm", "-F"]
+RUN apt-get install -y git
+
+COPY phpfpm-start.sh /opt/bin/phpfpm-start.sh
+RUN chmod u=rwx /opt/bin/phpfpm-start.sh
+
+ENTRYPOINT ["/opt/bin/phpfpm-start.sh"]
