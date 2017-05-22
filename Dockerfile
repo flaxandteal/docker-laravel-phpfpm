@@ -1,58 +1,19 @@
-FROM debian:jessie
+FROM php:7.0-fpm
 
-MAINTAINER "Dylan Lindgren" <dylan.lindgren@gmail.com>
-
-# Install PHP-FPM and popular/laravel required extensions
-RUN apt-get update -y && \
-    apt-get install -y \
-    php5-fpm \
-    php5-curl \
-    php5-gd \
-    php5-geoip \
-    php5-imagick \
-    php5-imap \
-    php5-json \
-    php5-ldap \
-    php5-mcrypt \
-    php5-memcache \
-    php5-memcached \
-    php5-mongo \
-    php5-mssql \
-    php5-mysqlnd \
-    php5-pgsql \
-    php5-redis \
-    php5-sqlite \
-    php5-xdebug \
-    php5-xmlrpc \
-    php5-xcache
-
-# Configure PHP-FPM
-RUN sed -i "s/;date.timezone =.*/date.timezone = UTC/" /etc/php5/fpm/php.ini && \
-    sed -i "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/" /etc/php5/fpm/php.ini && \
-    sed -i "s/display_errors = Off/display_errors = stderr/" /etc/php5/fpm/php.ini && \
-    sed -i "s/upload_max_filesize = 2M/upload_max_filesize = 30M/" /etc/php5/fpm/php.ini && \
-    sed -i "s/;opcache.enable=0/opcache.enable=0/" /etc/php5/fpm/php.ini && \
-    sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php5/fpm/php-fpm.conf && \
-    sed -i '/^listen = /clisten = 9000' /etc/php5/fpm/pool.d/www.conf && \
-    sed -i '/^listen.allowed_clients/c;listen.allowed_clients =' /etc/php5/fpm/pool.d/www.conf && \
-    sed -i '/^;catch_workers_output/ccatch_workers_output = yes' /etc/php5/fpm/pool.d/www.conf && \
-    sed -i '/^;env\[TEMP\] = .*/aenv[DB_PORT_3306_TCP_ADDR] = $DB_PORT_3306_TCP_ADDR' /etc/php5/fpm/pool.d/www.conf && \
-    sed -i "/^;clear_env = no/cclear_env = no" /etc/php5/fpm/pool.d/www.conf
-
-RUN apt-get install curl
-RUN curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/56 \
-    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
-    && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so \
-    && echo "extension=blackfire.so\nblackfire.agent_socket=\${BLACKFIRE_PORT}" > /etc/php5/fpm/conf.d/blackfire.ini
-
-RUN mkdir -p /data
-VOLUME ["/data"]
-
-EXPOSE 9000
-
-RUN apt-get install -y git
-
-COPY phpfpm-start.sh /opt/bin/phpfpm-start.sh
-RUN chmod u=rwx /opt/bin/phpfpm-start.sh
-
-ENTRYPOINT ["/opt/bin/phpfpm-start.sh"]
+RUN apt-get update && apt-get install -y \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng12-dev
+RUN pecl install redis && docker-php-ext-enable redis
+RUN docker-php-ext-install -j$(nproc) iconv mcrypt \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-install -j$(nproc) pdo
+RUN apt-get install -y libpq-dev libsqlite3-dev libcurl4-gnutls-dev
+RUN echo \
+    && docker-php-ext-install -j$(nproc) pdo_pgsql \
+    && docker-php-ext-install -j$(nproc) pdo_mysql \
+    && docker-php-ext-install -j$(nproc) pdo_sqlite \
+    && docker-php-ext-install -j$(nproc) json \
+    && docker-php-ext-install -j$(nproc) curl
