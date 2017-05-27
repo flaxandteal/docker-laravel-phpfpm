@@ -1,4 +1,4 @@
-FROM php:7.0-fpm
+FROM php:7.1-fpm
 
 RUN apt-get update && apt-get install -y \
         libfreetype6-dev \
@@ -17,3 +17,6 @@ RUN echo \
     && docker-php-ext-install -j$(nproc) pdo_sqlite \
     && docker-php-ext-install -j$(nproc) json \
     && docker-php-ext-install -j$(nproc) curl
+
+RUN sed -i 's/; process.max = .*/process.max = 256/' /usr/local/etc/php-fpm.conf
+RUN sed -i 's/pm.max_children = .*/pm.max_children = 20/' /usr/local/etc/php-fpm.d/www.conf
