@@ -23,3 +23,6 @@ RUN sed -i 's/pm.max_children = .*/pm.max_children = 40/' /usr/local/etc/php-fpm
 RUN sed -i 's/pm.start_servers = .*/pm.start_servers = 15/' /usr/local/etc/php-fpm.d/www.conf
 RUN sed -i 's/pm.min_spare_servers = .*/pm.min_spare_servers = 15/' /usr/local/etc/php-fpm.d/www.conf
 RUN sed -i 's/pm.max_spare_servers = .*/pm.max_spare_servers = 25/' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/pm.max_requests = .*/pm.max_requests = 500/' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/php_admin_value[memory_limit] = .*/php_admin_value[memory_limit] = 512M/' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/php_value[memory_limit] = .*/php_value[memory_limit] = 512M/' /usr/local/etc/php-fpm.d/www.conf
