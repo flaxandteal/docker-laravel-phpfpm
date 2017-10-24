@@ -20,3 +20,4 @@ RUN echo \
 
 RUN sed -i 's/; process.max = .*/process.max = 256/' /usr/local/etc/php-fpm.conf
 RUN sed -i 's/pm.max_children = .*/pm.max_children = 20/' /usr/local/etc/php-fpm.d/www.conf
+RUN sed -i 's/;php_admin_value\[memory_limit\] = .*/php_admin_value\[memory_limit\] = 256M/' /usr/local/etc/php-fpm.d/www.conf
