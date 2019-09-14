@@ -1,23 +1,26 @@
-FROM php:7.3.3-fpm
+FROM php:7.3.3-fpm-alpine
 
-RUN apt-get update && apt-get install -y \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libmcrypt-dev \
-        libpng12-dev
-RUN pecl install redis && docker-php-ext-enable redis
-RUN docker-php-ext-install -j$(nproc) iconv mcrypt \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install -j$(nproc) pdo
-RUN apt-get install -y libpq-dev libsqlite3-dev libcurl4-gnutls-dev zlib1g-dev lizip-dev
-RUN echo \
-    && docker-php-ext-install -j$(nproc) pdo_pgsql \
-    && docker-php-ext-install -j$(nproc) pdo_mysql \
-    && docker-php-ext-install -j$(nproc) pdo_sqlite \
-    && docker-php-ext-install -j$(nproc) json \
-    && docker-php-ext-install -j$(nproc) curl \
-    && docker-php-ext-install -j$(nproc) zip
+RUN apk add --no-cache \
+       freetype-dev \
+       libjpeg-turbo-dev \
+       libltdl \
+       libpng-dev \
+       postgresql-dev \
+       sqlite-dev \
+       curl-dev
+RUN apk add --no-cache alpine-sdk autoconf && \
+   pecl install redis && docker-php-ext-enable redis && \
+   docker-php-ext-install -j$(nproc) iconv \
+       && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+       && docker-php-ext-install -j$(nproc) gd \
+       && docker-php-ext-install -j$(nproc) pdo \
+       && docker-php-ext-install -j$(nproc) pdo_pgsql \
+       && docker-php-ext-install -j$(nproc) pdo_mysql \
+       && docker-php-ext-install -j$(nproc) pdo_sqlite \
+       && docker-php-ext-install -j$(nproc) json \
+       && docker-php-ext-install -j$(nproc) pcntl \
+       && docker-php-ext-install -j$(nproc) curl && \
+   apk del alpine-sdk autoconf
 
 RUN sed -i 's/; process.max = .*/process.max = 256/' /usr/local/etc/php-fpm.conf
 RUN sed -i 's/pm.max_children = .*/pm.max_children = 40/' /usr/local/etc/php-fpm.d/www.conf
