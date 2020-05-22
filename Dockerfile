@@ -14,6 +14,7 @@ RUN apk add --no-cache alpine-sdk autoconf && \
    docker-php-ext-install -j$(nproc) iconv \
        && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
        && docker-php-ext-install -j$(nproc) gd \
+       && docker-php-ext-install -j$(nproc) exif \
        && docker-php-ext-install -j$(nproc) pdo \
        && docker-php-ext-install -j$(nproc) pdo_pgsql \
        && docker-php-ext-install -j$(nproc) pdo_mysql \
