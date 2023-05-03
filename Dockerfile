@@ -7,6 +7,7 @@ RUN apk add --no-cache \
        libpng-dev \
        postgresql-dev \
        sqlite-dev \
+       libzip-dev zip \
        icu-dev \
        curl-dev
 RUN apk add --no-cache alpine-sdk autoconf && \
@@ -22,6 +23,7 @@ RUN apk add --no-cache alpine-sdk autoconf && \
        && docker-php-ext-install -j$(nproc) json \
        && docker-php-ext-install -j$(nproc) pcntl \
        && docker-php-ext-install -j$(nproc) intl \
+       && docker-php-ext-install -j$(nproc) zip \
        && docker-php-ext-install -j$(nproc) curl && \
    apk del alpine-sdk autoconf
 
