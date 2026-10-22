@@ -1,4 +1,4 @@
-FROM php:8.2.25-fpm-alpine
+FROM php:8.2.35-fpm-alpine
 
 RUN apk add --no-cache \
        freetype-dev \
